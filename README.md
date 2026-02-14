@@ -18,6 +18,26 @@ make run-external-trigger
 
 This triggers the externally triggered task and prints the workflow run id.
 
+## Choose a pattern
+
+- Sync task (`sync def` + `time.sleep`): simplest way to run blocking sync work safely.
+- Process-pool task (`async def` + `ProcessPoolExecutor`): better for truly heavy CPU workloads.
+
+### Run sync task example
+
+- Start worker: `make run-worker-sync`
+- Trigger (`run_external.py --task-name sync-sleep-task`): `make run-sync-trigger`
+
+### Run process pool example
+
+- Start worker: `make run-worker-sync`
+- Trigger (`run_external.py --task-name cpu-heavy-with-process-pool`): `make run-sync-process-pool-trigger`
+
+### Rule of thumb
+
+- Don't run blocking sync code directly inside `async def` tasks.
+- Use `sync def` task, or offload CPU work to a process pool.
+
 ## Track workflow status from workflow_run_id
 
 The external trigger example in `src/hatchet_playground/run_external.py` uses:
@@ -31,10 +51,20 @@ Current script entrypoint runs the stream-based flow (`main_no_wait_stream`) so 
 
 If you want polling instead of streaming, switch to `main_no_wait` in the `__main__` block.
 
+## External runner (`run_external.py`)
+
+- By task name (default polling): `uv run src/hatchet_playground/run_external.py --task-name <task_name>`
+- Stream events: `uv run src/hatchet_playground/run_external.py --task-name <task_name> --stream`
+- Optional input for `externally-triggered-task`: `--user-id 1234`
+
 ## Available commands
 
 ```shell
 make run-worker
 make run-local
 make run-external-trigger
+make run-external-trigger-stream
+make run-worker-sync
+make run-sync-trigger
+make run-sync-process-pool-trigger
 ```
