@@ -47,9 +47,7 @@ The external trigger example in `src/hatchet_playground/run_external.py` uses:
 - `hatchet.runs.get_run_ref(workflow_run_id).stream()` for live run events
 - `workflow_run_ref.aio_result()` to fetch typed output after completion
 
-Current script entrypoint runs the stream-based flow (`main_no_wait_stream`) so you can watch progress in real time.
-
-If you want polling instead of streaming, switch to `main_no_wait` in the `__main__` block.
+By default, `run_external.py` triggers and polls for terminal status. Use `--stream` to watch live events.
 
 ## External runner (`run_external.py`)
 
@@ -59,16 +57,17 @@ If you want polling instead of streaming, switch to `main_no_wait` in the `__mai
 - List configured task names: `uv run src/hatchet_playground/run_external.py --task-name externally-triggered-task --list-tasks`
 - Task input/output schemas are mapped by task name in `src/hatchet_playground/task_schemas.py`.
 
-## Available commands
+## Bulk run benchmark (`notebooks/task_status.ipynb`)
+
+The benchmark notebook uses Hatchet bulk trigger APIs via `ExternalTaskRunner.trigger_many_no_wait(...)`:
+
+- Bulk submit multiple runs per task in one call (`aio_run_many_no_wait`)
+- Track statuses until terminal states
+- Use deterministic run keys for dedupe/idempotency testing:
+  `f"{BENCHMARK_KEY_PREFIX}:{task_name}:{run_index}"`
+
+Open the notebook with:
 
 ```shell
-make run-worker
-make run-local
-make run-external
-make run-external-list-tasks
-make run-external-trigger
-make run-external-trigger-stream
-make run-worker-sync
-make run-sync-trigger
-make run-sync-process-pool-trigger
+make run-task-status-benchmark
 ```

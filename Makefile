@@ -45,3 +45,6 @@ run-sync-process-pool-trigger: ## Trigger the cpu process-pool workflow
 
 run-external-trigger-stream: ## Trigger externally-triggered-task and stream events
 	uv run src/hatchet_playground/run_external.py --task-name externally-triggered-task --input-json '{"user_id":1234}' --stream
+
+run-task-status-benchmark: ## Open the task status benchmark notebook (uses Hatchet bulk run)
+	uv run jupyter lab notebooks/task_status.ipynb
