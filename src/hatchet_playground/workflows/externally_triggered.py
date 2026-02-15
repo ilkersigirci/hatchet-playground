@@ -1,14 +1,9 @@
 from hatchet_sdk import Context, Hatchet
-from pydantic import BaseModel
 
-
-class TaskInput(BaseModel):
-    user_id: int
-
-
-class TaskOutput(BaseModel):
-    ok: bool
-
+from hatchet_playground.workflows.schemas import (
+    ExternallyTriggeredTaskInput as TaskInput,
+    ExternallyTriggeredTaskOutput as TaskOutput,
+)
 
 hatchet = Hatchet()
 

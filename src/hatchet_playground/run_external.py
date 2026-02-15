@@ -1,19 +1,14 @@
 import argparse
 import asyncio
+import json
+from dataclasses import is_dataclass
+from typing import Any
 
 from hatchet_sdk import EmptyModel, Hatchet
 from hatchet_sdk.clients.rest.models.v1_task_status import V1TaskStatus
 from pydantic import BaseModel
 
-
-# > Define models
-class TaskInput(BaseModel):
-    user_id: int
-
-
-class TaskOutput(BaseModel):
-    ok: bool
-
+from hatchet_playground.task_schemas import TASK_SCHEMAS, resolve_task_schema
 
 TERMINAL_STATUSES = {
     V1TaskStatus.COMPLETED,
@@ -24,30 +19,43 @@ TERMINAL_STATUSES = {
 
 class ExternalTaskRunner:
     def __init__(
-        self, task_name: str, stream: bool = False, user_id: int = 1234
+        self,
+        task_name: str,
+        input_payload: dict[str, Any],
+        stream: bool = False,
     ) -> None:
         self.hatchet = Hatchet()
         self.task_name = task_name
+        self.input_payload = input_payload
         self.stream = stream
-        self.user_id = user_id
 
     def _create_stub(self):
-        if self.task_name == "externally-triggered-task":
+        schema = resolve_task_schema(self.task_name)
+        if schema.output_validator is None:
             return self.hatchet.stubs.task(
                 name=self.task_name,
-                input_validator=TaskInput,
-                output_validator=TaskOutput,
+                input_validator=schema.input_validator,
             )
 
         return self.hatchet.stubs.task(
             name=self.task_name,
-            input_validator=EmptyModel,
+            input_validator=schema.input_validator,
+            output_validator=schema.output_validator,
         )
 
-    def _build_input(self) -> TaskInput | EmptyModel:
-        if self.task_name == "externally-triggered-task":
-            return TaskInput(user_id=self.user_id)
-        return EmptyModel()
+    def _build_input(self) -> Any:
+        validator = resolve_task_schema(self.task_name).input_validator
+
+        if validator is EmptyModel:
+            return EmptyModel()
+
+        if isinstance(validator, type) and issubclass(validator, BaseModel):
+            return validator.model_validate(self.input_payload)
+
+        if is_dataclass(validator):
+            return validator(**self.input_payload)
+
+        raise TypeError(f"Unsupported input validator type for task={self.task_name}")
 
     async def wait_for_terminal_status(
         self, workflow_run_id: str, poll_interval_seconds: float = 1.0
@@ -95,20 +103,39 @@ class ExternalTaskRunner:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--task-name", required=True)
     parser.add_argument(
-        "--task-name",
-        default="externally-triggered-task",
+        "--input-json",
+        default="{}",
+        help='Task input as JSON object, e.g. \'{"name": "Hatchet"}\'',
     )
     parser.add_argument("--stream", action="store_true")
-    parser.add_argument("--user-id", type=int, default=1234)
+    parser.add_argument(
+        "--list-tasks",
+        action="store_true",
+        help="List configured task names and exit",
+    )
     return parser.parse_args()
+
+
+def parse_input_json(input_json: str) -> dict[str, Any]:
+    parsed = json.loads(input_json)
+    if not isinstance(parsed, dict):
+        raise ValueError("--input-json must be a JSON object")
+    return parsed
 
 
 if __name__ == "__main__":
     args = parse_args()
+
+    if args.list_tasks:
+        for task_name in sorted(TASK_SCHEMAS.keys()):
+            print(task_name)
+        raise SystemExit(0)
+
     runner = ExternalTaskRunner(
         task_name=args.task_name,
+        input_payload=parse_input_json(args.input_json),
         stream=args.stream,
-        user_id=args.user_id,
     )
     asyncio.run(runner.run())

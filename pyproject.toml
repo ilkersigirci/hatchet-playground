@@ -90,3 +90,11 @@ combine-as-imports = true
 [build-system]
 requires = ["uv_build>=0.10,<0.14.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "jupyter>=1.1.1",
+    "pandas>=3.0.0",
+    "plotly>=6.5.2",
+    "ruff>=0.15.1",
+]

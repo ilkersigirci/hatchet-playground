@@ -1,18 +1,10 @@
-from dataclasses import dataclass
-
 from hatchet_sdk import Context
 
 from hatchet_playground.hatchet_client import hatchet
-
-
-@dataclass
-class Input:
-    name: str
-
-
-@dataclass
-class Output:
-    message: str
+from hatchet_playground.workflows.schemas import (
+    SayHelloInput as Input,
+    SayHelloOutput as Output,
+)
 
 
 @hatchet.task(input_validator=Input)

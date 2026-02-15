@@ -5,6 +5,9 @@ SHELL=/bin/bash
 
 .PHONY: run
 
+TASK_NAME ?= externally-triggered-task
+INPUT_JSON ?= {}
+
 help:
 	@grep -E '^[0-9a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) |\
 		 awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m\
@@ -22,8 +25,14 @@ run-local: ## Run the local
 run-worker: ## Run the worker
 	uv run src/hatchet_playground/worker.py
 
-run-external-trigger:
-	uv run src/hatchet_playground/run_external.py --task-name externally-triggered-task
+run-external: ## Trigger any task externally: make run-external TASK_NAME=say_hello INPUT_JSON='{"name":"Hatchet"}'
+	uv run src/hatchet_playground/run_external.py --task-name "$(TASK_NAME)" --input-json '$(INPUT_JSON)'
+
+run-external-list-tasks: ## List task names configured for the external runner
+	uv run src/hatchet_playground/run_external.py --task-name externally-triggered-task --list-tasks
+
+run-external-trigger: ## Trigger externally-triggered-task
+	uv run src/hatchet_playground/run_external.py --task-name externally-triggered-task --input-json '{"user_id":1234}'
 
 run-worker-sync: ## Run the sync worker
 	uv run src/hatchet_playground/worker_sync.py
@@ -35,4 +44,4 @@ run-sync-process-pool-trigger: ## Trigger the cpu process-pool workflow
 	uv run src/hatchet_playground/run_external.py --task-name cpu-heavy-with-process-pool
 
 run-external-trigger-stream: ## Trigger externally-triggered-task and stream events
-	uv run src/hatchet_playground/run_external.py --task-name externally-triggered-task --stream
+	uv run src/hatchet_playground/run_external.py --task-name externally-triggered-task --input-json '{"user_id":1234}' --stream

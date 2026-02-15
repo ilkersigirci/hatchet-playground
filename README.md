@@ -54,14 +54,18 @@ If you want polling instead of streaming, switch to `main_no_wait` in the `__mai
 ## External runner (`run_external.py`)
 
 - By task name (default polling): `uv run src/hatchet_playground/run_external.py --task-name <task_name>`
+- Pass input as JSON object: `--input-json '{"name":"Hatchet"}'`
 - Stream events: `uv run src/hatchet_playground/run_external.py --task-name <task_name> --stream`
-- Optional input for `externally-triggered-task`: `--user-id 1234`
+- List configured task names: `uv run src/hatchet_playground/run_external.py --task-name externally-triggered-task --list-tasks`
+- Task input/output schemas are mapped by task name in `src/hatchet_playground/task_schemas.py`.
 
 ## Available commands
 
 ```shell
 make run-worker
 make run-local
+make run-external
+make run-external-list-tasks
 make run-external-trigger
 make run-external-trigger-stream
 make run-worker-sync
