@@ -25,4 +25,6 @@ async def langfuse_task(input: ChatOtelInput, ctx: Context) -> ChatOtelOutput:
         ],
     )
 
+    ctx.log(f"Executed langfuse task with input: {input.question}")
+
     return ChatOtelOutput(answer=generation.choices[0].message.content)
