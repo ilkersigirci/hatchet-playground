@@ -1,14 +1,15 @@
 from dataclasses import dataclass
 from typing import Any
 
-from hatchet_sdk import EmptyModel
-
-from hatchet_playground.workflows.schemas import (
+from hatchet_schemas import (
+    ChatOtelInput,
+    ChatOtelOutput,
     ExternallyTriggeredTaskInput,
     ExternallyTriggeredTaskOutput,
     SayHelloInput,
     SayHelloOutput,
 )
+from hatchet_sdk import EmptyModel
 
 
 @dataclass(frozen=True)
@@ -31,6 +32,10 @@ TASK_SCHEMAS: dict[str, TaskSchema] = {
     ),
     "sync-sleep-task": TaskSchema(input_validator=EmptyModel),
     "cpu-heavy-with-process-pool": TaskSchema(input_validator=EmptyModel),
+    "chat-otel": TaskSchema(
+        input_validator=ChatOtelInput,
+        output_validator=ChatOtelOutput,
+    ),
 }
 
 

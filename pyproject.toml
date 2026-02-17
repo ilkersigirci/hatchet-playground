@@ -9,7 +9,11 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
-dependencies = ["hatchet-sdk>=1.24"]
+dependencies = [
+    "hatchet-schemas",
+    "hatchet-sdk[otel]>=1.24",
+    "langfuse>=3.14.2",
+]
 
 [tool.ruff]
 line-length = 88
@@ -90,6 +94,12 @@ combine-as-imports = true
 [build-system]
 requires = ["uv_build>=0.10,<0.14.0"]
 build-backend = "uv_build"
+
+[tool.uv.sources]
+hatchet-schemas = { workspace = true }
+
+[tool.uv.workspace]
+members = ["packages/hatchet_schemas"]
 
 [dependency-groups]
 dev = [

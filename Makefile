@@ -26,25 +26,25 @@ run-worker: ## Run the worker
 	uv run src/hatchet_playground/worker.py
 
 run-external: ## Trigger any task externally: make run-external TASK_NAME=say_hello INPUT_JSON='{"name":"Hatchet"}'
-	uv run src/hatchet_playground/run_external.py --task-name "$(TASK_NAME)" --input-json '$(INPUT_JSON)'
+	uv run src/hatchet_playground/external/runner.py --task-name "$(TASK_NAME)" --input-json '$(INPUT_JSON)'
 
 run-external-list-tasks: ## List task names configured for the external runner
-	uv run src/hatchet_playground/run_external.py --task-name externally-triggered-task --list-tasks
+	uv run src/hatchet_playground/external/runner.py --task-name externally-triggered-task --list-tasks
 
 run-external-trigger: ## Trigger externally-triggered-task
-	uv run src/hatchet_playground/run_external.py --task-name externally-triggered-task --input-json '{"user_id":1234}'
+	uv run src/hatchet_playground/external/runner.py --task-name externally-triggered-task --input-json '{"user_id":1234}'
 
 run-worker-sync: ## Run the sync worker
 	uv run src/hatchet_playground/worker_sync.py
 
 run-sync-trigger: ## Trigger the sync cpu-bound workflow
-	uv run src/hatchet_playground/run_external.py --task-name sync-sleep-task
+	uv run src/hatchet_playground/external/runner.py --task-name sync-sleep-task
 
 run-sync-process-pool-trigger: ## Trigger the cpu process-pool workflow
-	uv run src/hatchet_playground/run_external.py --task-name cpu-heavy-with-process-pool
+	uv run src/hatchet_playground/external/runner.py --task-name cpu-heavy-with-process-pool
 
 run-external-trigger-stream: ## Trigger externally-triggered-task and stream events
-	uv run src/hatchet_playground/run_external.py --task-name externally-triggered-task --input-json '{"user_id":1234}' --stream
+	uv run src/hatchet_playground/external/runner.py --task-name externally-triggered-task --input-json '{"user_id":1234}' --stream
 
 run-task-status-benchmark: ## Open the task status benchmark notebook (uses Hatchet bulk run)
 	uv run jupyter lab notebooks/task_status.ipynb

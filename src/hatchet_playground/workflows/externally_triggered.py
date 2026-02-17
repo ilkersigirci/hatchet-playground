@@ -1,9 +1,8 @@
-from hatchet_sdk import Context, Hatchet
-
-from hatchet_playground.workflows.schemas import (
+from hatchet_schemas import (
     ExternallyTriggeredTaskInput as TaskInput,
     ExternallyTriggeredTaskOutput as TaskOutput,
 )
+from hatchet_sdk import Context, Hatchet
 
 hatchet = Hatchet()
 

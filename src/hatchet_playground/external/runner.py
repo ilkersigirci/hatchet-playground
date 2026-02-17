@@ -8,7 +8,7 @@ from hatchet_sdk import EmptyModel, Hatchet
 from hatchet_sdk.clients.rest.models.v1_task_status import V1TaskStatus
 from pydantic import BaseModel
 
-from hatchet_playground.task_schemas import TASK_SCHEMAS, resolve_task_schema
+from .task_schemas import TASK_SCHEMAS, resolve_task_schema
 
 TERMINAL_STATUSES = {
     V1TaskStatus.COMPLETED,
