@@ -55,7 +55,21 @@ By default, `external/runner.py` triggers and polls for terminal status. Use `--
 - Pass input as JSON object: `--input-json '{"name":"Hatchet"}'`
 - Stream events: `uv run src/hatchet_playground/external/runner.py --task-name <task_name> --stream`
 - List configured task names: `uv run src/hatchet_playground/external/runner.py --task-name externally-triggered-task --list-tasks`
-- Task input/output schemas are mapped by task name in `src/hatchet_playground/task_schemas.py`.
+- Task input/output schemas are mapped by task name in `src/hatchet_playground/external/task_schemas.py`.
+
+## External FastAPI API (`external/fastapi_app.py`)
+
+- Run: `make run-external-fastapi`
+- Health: `curl http://127.0.0.1:8000/healthz`
+- List task names: `curl http://127.0.0.1:8000/tasks`
+- Trigger task:
+  `curl -X POST http://127.0.0.1:8000/tasks/externally-triggered-task/run -H 'content-type: application/json' -d '{"input_payload":{"user_id":1234}}'`
+- Trigger and wait for completion:
+  `curl -X POST http://127.0.0.1:8000/tasks/say_hello/run -H 'content-type: application/json' -d '{"input_payload":{"name":"Hatchet"},"wait_for_completion":true}'`
+- Check run status:
+  `curl http://127.0.0.1:8000/runs/<workflow_run_id>/status`
+
+This API applies OpenTelemetry instrumentation to both FastAPI (`FastAPIInstrumentor`) and Hatchet (`HatchetInstrumentor`).
 
 ## Bulk run benchmark (`notebooks/task_status.ipynb`)
 

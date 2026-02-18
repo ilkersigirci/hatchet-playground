@@ -10,9 +10,11 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
+    "fastapi[standard]>=0.116.1",
     "hatchet-schemas",
     "hatchet-sdk[otel]>=1.24",
     "langfuse>=3.14.2",
+    "opentelemetry-instrumentation-fastapi>=0.60b1",
 ]
 
 [tool.ruff]
