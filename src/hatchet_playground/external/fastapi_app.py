@@ -1,5 +1,4 @@
 import os
-from dataclasses import asdict, is_dataclass
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
@@ -40,12 +39,12 @@ class RunStatusResponse(BaseModel):
     status: str
 
 
-def _serialize_result(value: Any) -> Any:
-    if isinstance(value, BaseModel):
-        return value.model_dump()
-    if is_dataclass(value):
-        return asdict(value)
-    return value
+def _serialize_result(value: BaseModel) -> dict[str, Any]:
+    if not isinstance(value, BaseModel):
+        raise TypeError(
+            f"Expected Pydantic BaseModel result, got {type(value).__name__}"
+        )
+    return value.model_dump()
 
 
 @app.get("/healthz")

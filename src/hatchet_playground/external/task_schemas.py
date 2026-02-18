@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Any
 
 from hatchet_schemas import (
@@ -10,10 +9,12 @@ from hatchet_schemas import (
     SayHelloOutput,
 )
 from hatchet_sdk import EmptyModel
+from pydantic import BaseModel, ConfigDict
 
 
-@dataclass(frozen=True)
-class TaskSchema:
+class TaskSchema(BaseModel):
+    model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
+
     input_validator: type[Any]
     output_validator: type[Any] | None = None
 
